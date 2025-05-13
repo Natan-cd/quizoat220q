@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz HTML, CSS e JavaScript</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
+      background: #429DF8;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      font-weight: 900;
+      text-align: center;
+    }
+
+    #quiz-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .question-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    .question {
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .answers button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      background-color: #eee;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-weight: 600;
+    }
+
+    .answers button:hover {
+      background-color: #ddd;
+    }
+
+    .correct {
+      background-color: #4caf50 !important;
+      color: white;
+    }
+
+    .wrong {
+      background-color: #f44336 !important;
+      color: white;
+    }
+
+    #progress-container {
+      margin-top: 20px;
+    }
+
+    #progress-bar {
+      height: 25px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0;
+      background: #7339BB;
+      transition: width 0.3s ease;
+    }
+
+    #progress-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      line-height: 25px;
+      color: #000;
+      font-weight: bold;
+    }
+
+    #score {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    #final-message {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #333;
+      text-align: center;
+    }
+
+    #restart-btn {
+      display: none;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #2196f3;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #restart-btn:hover {
+      background-color: #1976d2;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      #quiz-container {
+        padding: 15px;
+      }
+
+      .question {
+        font-size: 16px;
+      }
+
+      .answers button {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      #progress-container {
+        margin-top: 15px;
+      }
+
+      #score {
+        font-size: 14px;
+      }
+
+      #final-message {
+        font-size: 16px;
+      }
+
+      #restart-btn {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz HTML, CSS e JavaScript</h1>
+  <div id="quiz-container">
+    <img id="question-image" class="question-image" src="" alt="Imagem da pergunta">
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div id="score">Pontuação: 0/100</div>
+
+    <div id="progress-container">
+      <div id="progress-bar">
+        <div id="progress"></div>
+        <div id="progress-text">0%</div>
+      </div>
+    </div>
+
+    <div id="final-message"></div>
+    <button id="restart-btn" onclick="restartQuiz()">Reiniciar Quiz</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. O que significa HTML?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
+        answers: [
+          "HiperTexto de Marcação Legal",
+          "HiperTexto de Marcação de Linguagem",
+          "Linguagem de Marcação de HiperTexto",
+          "Linguagem de Marcação de Código"
+        ],
+        correct: 2
+      },
+      {
+        question: "2. Para que serve o CSS?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg",
+        answers: [
+          "Para criar imagens no site",
+          "Para programar o site",
+          "Para adicionar estilos e cores ao site",
+          "Para salvar arquivos do site"
+        ],
+        correct: 2
+      },
+      {
+        question: "3. Qual dessas tags é usada para colocar um título no HTML?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
+        answers: ["<title>", "<head>", "<h1>", "<div>"],
+        correct: 2
+      },
+      {
+        question: "4. Qual dessas opções é um jeito correto de mudar a cor de fundo com CSS?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg",
+        answers: [
+          "background-color: red;",
+          "setBackground(red);",
+          "color-background = red",
+          "bg: red;"
+        ],
+        correct: 0
+      },
+      {
+        question: "5. O que JavaScript faz em um site?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png",
+        answers: [
+          "Deixa o site com mais cor",
+          "Adiciona interatividade, como cliques e animações",
+          "Cria textos",
+          "Muda o nome do site"
+        ],
+        correct: 1
+      },
+      {
+        question: "6. Qual dessas linguagens é usada para criar a estrutura de um site?",
+        image: "https://cdn-icons-png.flaticon.com/512/919/919827.png",
+        answers: ["CSS", "HTML", "JavaScript", "Python"],
+        correct: 1
+      },
+      {
+        question: "7. Qual das tags abaixo é usada para colocar uma imagem no HTML?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
+        answers: ["<img>", "<picture>", "<image>", "<src>"],
+        correct: 0
+      },
+      {
+        question: "8. Como se escreve um comentário em CSS?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg",
+        answers: [
+          "<!-- comentário -->",
+          "// comentário",
+          "/* comentário */",
+          "# comentário"
+        ],
+        correct: 2
+      },
+      {
+        question: "9. Qual é o símbolo usado para selecionar uma classe no CSS?",
+        image: "https://cdn-icons-png.flaticon.com/512/732/732190.png",
+        answers: ["#", ".", "/", "@"],
+        correct: 1
+      },
+      {
+        question: "10. Como se faz um botão funcionar com JavaScript?",
+        image: "https://cdn.pixabay.com/photo/2015/06/24/15/45/code-820275_1280.jpg",
+        answers: [
+          "Com uma imagem",
+          "Com a função makeButton()",
+          "Com a tag <script> e código JavaScript",
+          "Com a tag <style>"
+        ],
+        correct: 2
+      }
+    ];
+
+    const maxScore = 100;
+    const scorePerCorrect = Math.floor(maxScore / questions.length);
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionImageEl = document.getElementById("question-image");
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const scoreEl = document.getElementById("score");
+    const progressEl = document.getElementById("progress");
+    const progressTextEl = document.getElementById("progress-text");
+    const finalMessageEl = document.getElementById("final-message");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      questionEl.textContent = q.question;
+      questionImageEl.src = q.image;
+      answersEl.innerHTML = "";
+      finalMessageEl.textContent = "";
+
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(index, btn);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(index, buttonClicked) {
+      const correctIndex = questions[currentQuestion].correct;
+      const buttons = answersEl.querySelectorAll("button");
+
+      buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === correctIndex) {
+          btn.classList.add("correct");
+        } else if (i === index && i !== correctIndex) {
+          btn.classList.add("wrong");
+        }
+      });
+
+      if (index === correctIndex) {
+        score += scorePerCorrect;
+        score = Math.min(score, maxScore);
+      }
+
+      setTimeout(() => {
+        currentQuestion++;
+        updateUI();
+      }, 1000);
+    }
+
+    function updateUI() {
+      scoreEl.textContent = Pontuação: ${score}/${maxScore};
+      const progressPercent = (score / maxScore) * 100;
+      progressEl.style.width = ${progressPercent}%;
+      progressTextEl.textContent = ${progressPercent}%;
+
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        questionEl.textContent = "";
+        questionImageEl.style.display = "none";
+        answersEl.innerHTML = "";
+        finalMessageEl.textContent = Fim do quiz! Sua pontuação foi ${score}/${maxScore}.;
+        restartBtn.style.display = "block";
+      }
+    }
+
+    function restartQuiz() {
+      score = 0;
+      currentQuestion = 0;
+      restartBtn.style.display = "none";
+      questionImageEl.style.display = "block";
+      updateUI();
+    }
+
+    // Inicia o quiz
+    showQuestion();
+  </script>
+</body>
+</html>
